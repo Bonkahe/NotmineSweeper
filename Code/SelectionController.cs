@@ -1,11 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace DryadSweeper
 {
     public class SelectionController : MonoBehaviour
     {
+        public TMP_InputField messageDisplay;
+
         public GameObject selectorPrefab;
 
         public WorldGen worldgen;
@@ -16,7 +20,7 @@ namespace DryadSweeper
 
         private void Update()
         {
-            if (curSelector != null)
+            if (curSelector != null && !IsUIactive())
             {
                 if (Input.GetKeyDown(KeyCode.A))
                 {
@@ -71,6 +75,14 @@ namespace DryadSweeper
             Destroy(curSelector);
         }
 
+        public void SaveMessage()
+        {
+            if (x > 0 && x < size_x && y > 0 && y < size_y)
+            {
+                worldgen.OverwriteMessage(messageDisplay.text, x, y);
+            }
+        }
+
         private void Query(int index)
         {
             if (x > 0 && x < size_x && y > 0 && y < size_y)
@@ -84,6 +96,11 @@ namespace DryadSweeper
                     worldgen.QuerySeal(x, y);
                 }
             }
+        }
+
+        private bool IsUIactive()
+        {
+            return EventSystem.current.currentSelectedGameObject != null;
         }
     }
 }

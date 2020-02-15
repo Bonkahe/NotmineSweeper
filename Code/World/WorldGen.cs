@@ -227,6 +227,10 @@ namespace DryadSweeper
             {
                 obj.SetDisplay(value.ToString());
                 if (!muted) ConsoleMaster.Instance.Output(string.Format("//ResultOutput = SUCCESS(Output:Datamine_Results(Nearby_Secure_Nodes) = {0})", value));
+                if (message != "")
+                {
+                    ConsoleMaster.Instance.Output(string.Format("//TextFileFound = '{0}'", message));
+                }
             }
             else
             {
@@ -242,12 +246,17 @@ namespace DryadSweeper
             {
                 obj.SetDisplay("!");
                 if (!muted) ConsoleMaster.Instance.Output("//ResultOutput = FAILURE(Output:SecurityNodeActivated - WARNING: 'Possible detection of activities, Integrity comprimised.')");
+                
                 // Add integrity damage
             }
             else
             {
                 obj.SetDisplay("[x]");
                 if (!muted) ConsoleMaster.Instance.Output("//ResultOutput = SUCCESS(Output:'Security node successfully sealed.')");
+                if (message != "")
+                {
+                    ConsoleMaster.Instance.Output(string.Format("//TextFileFound = '{0}'", message));
+                }
             }
         }
 
@@ -294,6 +303,11 @@ namespace DryadSweeper
                         if (obj.y + i >= obj.masterref.size_y) continue;
                         if (obj.masterref.world[obj.x, obj.y + i] != null) obj.masterref.world[obj.x, obj.y + i].SonarRecieved();
                     }
+                }
+
+                if (message != "")
+                {
+                    ConsoleMaster.Instance.Output(string.Format("//TextFileFound = '{0}'", message));
                 }
             }
             else
@@ -347,8 +361,11 @@ namespace DryadSweeper
                         }
                         break;
                     case (3):
-                        ConsoleMaster.Instance.Output("//DecryptionResults('Cache code detected, recovering...')");
-                        ConsoleMaster.Instance.Output(string.Format("//CacheCode = '{0}'", message));
+                        if (message != "")
+                        {
+                            ConsoleMaster.Instance.Output("//DecryptionResults('Cache code detected, recovering...')");
+                            ConsoleMaster.Instance.Output(string.Format("//CacheCode = '{0}'", message));
+                        }
                         break;
                 }
             }
@@ -550,6 +567,14 @@ namespace DryadSweeper
             else
             {
                 if (world[x, y] != null) world[x, y].Seal();
+            }
+        }
+
+        public void OverwriteMessage(string value, int x, int y)
+        {
+            if (editmode)
+            {
+                world[x, y].message = value;
             }
         }
 
