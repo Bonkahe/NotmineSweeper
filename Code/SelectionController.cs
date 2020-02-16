@@ -27,6 +27,7 @@ namespace DryadSweeper
                     x--;
                     if (x < 0) x++;
                     curSelector.transform.position = new Vector3(x - size_x / 2, 0, y - size_y / 2);
+                    SetDisplay();
 
                 }
                 if (Input.GetKeyDown(KeyCode.D))
@@ -34,19 +35,21 @@ namespace DryadSweeper
                     x++;
                     if (x >= size_x) x--;
                     curSelector.transform.position = new Vector3(x - size_x / 2, 0, y - size_y / 2);
-
+                    SetDisplay();
                 }
                 if (Input.GetKeyDown(KeyCode.S))
                 {
                     y--;
                     if (y < 0) y++;
                     curSelector.transform.position = new Vector3(x - size_x / 2, 0, y - size_y / 2);
+                    SetDisplay();
                 }
                 if (Input.GetKeyDown(KeyCode.W))
                 {
                     y++;
                     if (y >= size_y) y--; 
                     curSelector.transform.position = new Vector3(x - size_x / 2, 0, y - size_y / 2);
+                    SetDisplay();
                 }
 
                 if (Input.GetKeyDown(KeyCode.Q))
@@ -77,10 +80,12 @@ namespace DryadSweeper
 
         public void SaveMessage()
         {
-            if (x > 0 && x < size_x && y > 0 && y < size_y)
-            {
-                worldgen.OverwriteMessage(messageDisplay.text, x, y);
-            }
+            worldgen.OverwriteMessage(messageDisplay.text, x, y);
+        }
+
+        private void SetDisplay()
+        {
+            messageDisplay.text = worldgen.world[x, y].message;            
         }
 
         private void Query(int index)

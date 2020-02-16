@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace DryadSweeper
@@ -53,6 +54,8 @@ namespace DryadSweeper
 
         private bool visible = false;
 
+        private WorldGen localworldgenref;
+
         //Constructors:
         public Tile(TilePhysical obj)
         {
@@ -79,6 +82,7 @@ namespace DryadSweeper
 
         public void SetColor(WorldGen worldGenref)
         {
+            localworldgenref = worldGenref;
             foreach(TileColor tileColor in worldGenref.TileColors)
             {
                 if (tileColor.tile == currentTile)
@@ -187,6 +191,8 @@ namespace DryadSweeper
 
                 ConsoleMaster.Instance.Output(string.Format("//Run:(SecuritySeal(Node[{0},{1}]));", obj.x, obj.y));
 
+                ConsoleMaster.Instance.Output(string.Format("//TextFileFound = '{0}'", message));
+
                 switch (currentTile)
                 {
                     case Tiletype.spawn:
@@ -227,7 +233,7 @@ namespace DryadSweeper
             {
                 obj.SetDisplay(value.ToString());
                 if (!muted) ConsoleMaster.Instance.Output(string.Format("//ResultOutput = SUCCESS(Output:Datamine_Results(Nearby_Secure_Nodes) = {0})", value));
-                if (message != "")
+                if (message != null)
                 {
                     ConsoleMaster.Instance.Output(string.Format("//TextFileFound = '{0}'", message));
                 }
@@ -253,7 +259,7 @@ namespace DryadSweeper
             {
                 obj.SetDisplay("[x]");
                 if (!muted) ConsoleMaster.Instance.Output("//ResultOutput = SUCCESS(Output:'Security node successfully sealed.')");
-                if (message != "")
+                if (message != null)
                 {
                     ConsoleMaster.Instance.Output(string.Format("//TextFileFound = '{0}'", message));
                 }
@@ -305,7 +311,7 @@ namespace DryadSweeper
                     }
                 }
 
-                if (message != "")
+                if (message != null)
                 {
                     ConsoleMaster.Instance.Output(string.Format("//TextFileFound = '{0}'", message));
                 }
@@ -345,7 +351,7 @@ namespace DryadSweeper
                         // check there are any sealed good nodes...
                         foreach(Tile tile in obj.masterref.world)
                         {
-                            if (tile.issealed && tile.currentTile != Tiletype.bomb && tile.currentTile != Tiletype.antagonist)
+                            if (tile.issealed && tile.currentTile != Tiletype.nothing && tile.currentTile != Tiletype.bomb && tile.currentTile != Tiletype.antagonist)
                             {
                                 complete = true;
                                 ConsoleMaster.Instance.Output("//NodeSearchResults('Sealed data node found, unlocking.')");
@@ -361,7 +367,7 @@ namespace DryadSweeper
                         }
                         break;
                     case (3):
-                        if (message != "")
+                        if (message != null)
                         {
                             ConsoleMaster.Instance.Output("//DecryptionResults('Cache code detected, recovering...')");
                             ConsoleMaster.Instance.Output(string.Format("//CacheCode = '{0}'", message));
@@ -379,7 +385,27 @@ namespace DryadSweeper
 
         void Tile_Random(bool seal, bool muted)
         {
+            if (!seal)
+            {
+                obj.SetDisplay(value.ToString());
+                if (!muted) ConsoleMaster.Instance.Output(string.Format("//ResultOutput = SUCCESS(Output:Datamine_Results(Nearby_Secure_Nodes) = {0})", value));
+                if (message != null)
+                {
+                    ConsoleMaster.Instance.Output(string.Format("//TextFileFound = '{0}'", message));
+                }
 
+                currentTile = (Tiletype)UnityEngine.Random.Range(1, (float)Enum.GetValues(typeof(Tiletype)).Cast<Tiletype>().Max() - 1);
+                ConsoleMaster.Instance.Output(string.Format("//Abnormaltiledetected: typeof('{0}')", currentTile));
+                visible = false;
+                SetColor(localworldgenref);
+                Activate();
+            }
+            else
+            {
+                obj.SetDisplay("[x]");
+                if (!muted) ConsoleMaster.Instance.Output("//ResultOutput = FAILURE(Output:DataNodeSealed - WARNING: 'Possible detection of activities, Integrity comprimised.')");
+                // Add integrity damage
+            }
         }
 
         void Tile_Antagonist(bool seal, bool muted)
